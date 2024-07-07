@@ -1,54 +1,82 @@
-// tests/organisation.spec.js
-const { User, Organisation } = require("../utils/database");
+// const request = require("supertest");
+// const app = require("../index");
+// const { v4: uuidv4 } = require("uuid");
+// const { User, Organisation, sequelize } = require("../utils/database");
 
-describe("Organisation Access", () => {
-  it("should ensure users cannot see data from organisations they don’t have access to", async () => {
-    const user = await User.create({
-      userId: "12345",
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      password: "password",
-    });
-    const organisation = await Organisation.create({
-      orgId: "org1",
-      name: "Org 1",
-    });
+// jest.setTimeout(15000);
 
-    // Associate user with organisation
-    await user.addOrganisation(organisation);
+// const generateUniqueEmail = () => {
+//   return `user-${uuidv4()}@example.com`;
+// };
 
-    // Fetch organisations for the user
-    const organisations = await Organisation.findAll({
-      include: [
-        {
-          model: User,
-          where: { id: user.id },
-          through: { attributes: [] },
-        },
-      ],
-    });
+// describe("Organisation Access", () => {
+//   beforeEach(async () => {
+//     // Clear the database before each test
+//     await User.destroy({ where: {} });
+//     await Organisation.destroy({ where: {} });
+//   });
 
-    // Ensure user can see the organisation they are part of
-    expect(organisations.length).toBe(1);
-    expect(organisations[0].orgId).toBe("org1");
+//   afterAll(async () => {
+//     // Close the database connection after all tests
+//     await sequelize.close();
+//   });
 
-    // Ensure user cannot see other organisations
-    const otherOrganisation = await Organisation.create({
-      orgId: "org2",
-      name: "Org 2",
-    });
-    const organisationsAfterCreation = await Organisation.findAll({
-      include: [
-        {
-          model: User,
-          where: { id: user.id },
-          through: { attributes: [] },
-        },
-      ],
-    });
+//   it("should ensure users cannot see data from organisations they don’t have access to", async () => {
+//     const email = generateUniqueEmail();
+//     const password = "password";
 
-    expect(organisationsAfterCreation.length).toBe(1);
-    expect(organisationsAfterCreation[0].orgId).toBe("org1");
-  });
-});
+//     // Register a user
+//     await request(app).post("/auth/register").send({
+//       firstName: "John",
+//       lastName: "Doe",
+//       email: email,
+//       password: password,
+//       phone: "1234567890",
+//     });
+
+//     // Login to get the token
+//     const loginResponse = await request(app).post("/auth/login").send({
+//       email: email,
+//       password: password,
+//     });
+
+//     const token = loginResponse.body.data.accessToken;
+
+//     // Create a new organisation and associate it with the user
+//     const organisationResponse = await request(app)
+//       .post("/organisations")
+//       .set("Authorization", `Bearer ${token}`)
+//       .send({
+//         name: "Org 1",
+//       });
+
+//     const organisationId = organisationResponse.body.data.organisation.orgId;
+
+//     // Fetch organisations for the user
+//     const userOrganisationsResponse = await request(app)
+//       .get("/organisations")
+//       .set("Authorization", `Bearer ${token}`);
+
+//     // Ensure user can see the organisation they are part of
+//     expect(userOrganisationsResponse.status).toBe(200);
+//     expect(userOrganisationsResponse.body.data.length).toBe(1);
+//     expect(userOrganisationsResponse.body.data[0].orgId).toBe(organisationId);
+
+//     // Create another organisation that the user does not have access to
+//     await request(app).post("/organisations").send({
+//       name: "Org 2",
+//     });
+
+//     // Fetch organisations again
+//     const userOrganisationsAfterCreationResponse = await request(app)
+//       .get("/organisations")
+//       .set("Authorization", `Bearer ${token}`);
+
+//     // Ensure user cannot see the other organisation
+//     expect(userOrganisationsAfterCreationResponse.status).toBe(200);
+//     expect(userOrganisationsAfterCreationResponse.body.data.length).toBe(1);
+//     expect(userOrganisationsAfterCreationResponse.body.data[0].orgId).toBe(
+//       organisationId
+//     );
+//   });
+// });

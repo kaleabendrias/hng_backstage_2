@@ -36,6 +36,7 @@ const authenticateToken = (req, res, next) => {
 
 const register = async (req, res) => {
   const { firstName, lastName, email, password, phone } = req.body;
+
   const validationErrors = validateRegistration({
     firstName,
     lastName,
@@ -44,6 +45,13 @@ const register = async (req, res) => {
   });
   if (validationErrors.length > 0) {
     return res.status(422).json({ errors: validationErrors });
+  }
+
+  const existingUser = await User.findOne({ where: { email } });
+  if (existingUser) {
+    return res.status(400).json({
+      errors: [{ message: "Email already exists" }],
+    });
   }
 
   try {
