@@ -3,6 +3,7 @@ require("dotenv").config();
 const { connectDatabase } = require("./utils/database");
 const authRoutes = require("./routes/authRoutes");
 const cron = require("node-cron");
+const axios = require("axios");
 
 connectDatabase();
 
