@@ -171,7 +171,7 @@ const user = async (req, res) => {
   console.log("init2");
   if (!user) return res.sendStatus(404);
 
-  res.json({
+  res.status(200).json({
     status: "success",
     message: "User retrieved successfully",
     data: {
