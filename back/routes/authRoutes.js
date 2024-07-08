@@ -4,13 +4,14 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const authenticateToken = (req, res, next) => {
-  const token = req.headers["authorization"];
   const authHeader = req.headers["authorization"];
   if (!authHeader)
     return res
       .status(401)
       .json({ status: "error", message: "No token provided" });
 
+  const token = authHeader.split(" ")[1];
+  console.log(token);
   if (!token)
     return res
       .status(401)
